@@ -9628,10 +9628,11 @@ MonoBehaviour:
   animator: {fileID: 1426222321}
   controller: {fileID: 589607262}
   movementScript: {fileID: 589607261}
+  hitbox: {fileID: 0}
+  dmg: 0
+  Knockback: 0
   punchCooldown: 0.5
   kickCooldown: 0.8
-  punchDamage: 10
-  kickDamage: 20
   dampening: 0.1
 --- !u!1001 &1429373608
 PrefabInstance:
