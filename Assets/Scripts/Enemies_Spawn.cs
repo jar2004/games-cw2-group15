@@ -16,7 +16,7 @@ public class Enemies_Spawn : MonoBehaviour
     public GameObject PlayerPrefab;
     public GameObject BossPrefab;
     public List<GameObject> EnemyPrefabs = new List<GameObject>();
-    public bool SpawnEnemies = false;
+    public bool Spawn_Enemies = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
