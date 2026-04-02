@@ -15,7 +15,7 @@ GameObject:
   - component: {fileID: 5305372450245089079}
   m_Layer: 0
   m_Name: FistEnemy
-  m_TagString: Untagged
+  m_TagString: Enemy
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -44,7 +44,7 @@ Rigidbody:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6137816244098058170}
   serializedVersion: 5
-  m_Mass: 1
+  m_Mass: 2
   m_LinearDamping: 0
   m_AngularDamping: 0.05
   m_CenterOfMass: {x: 0, y: 0, z: 0}
@@ -126,6 +126,7 @@ MonoBehaviour:
   attackCooldown: 1.5
   moveSpeed: 3.5
   detectionRange: 15
+  xpReward: 35
 --- !u!1001 &191724222315263820
 PrefabInstance:
   m_ObjectHideFlags: 0

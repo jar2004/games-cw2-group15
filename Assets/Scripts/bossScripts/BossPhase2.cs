@@ -5,56 +5,68 @@ public class BossPhase2 : BossBase
 {
     private Transform player;
     private NavMeshAgent agent;
-
     private GunLogic gunLogic;
 
-    private float runDistance = 10f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-  public override void enterState(BossManager e)
-  {
-    player = GameObject.FindGameObjectWithTag("Player").transform;
-    agent = e.GetComponent<NavMeshAgent>();
-    gunLogic = e.GetComponent<GunLogic>();
+    private float aggroRange = 30f;
+    private float shootRange = 10f;
+    private float fleeRange = 5f;
 
+    public override void enterState(BossManager e)
+    {
+        player = GameObject.FindGameObjectWithTag("Player").transform;
+        agent = e.GetComponent<NavMeshAgent>();
+        gunLogic = e.GetComponent<GunLogic>();
 
-  }
-  public override void updateState(BossManager e)
-  {
+        // Speed up in phase 2
+        agent.speed = 6f;
 
-        if(Vector3.Distance(e.transform.position, e.player.transform.position) > 30)
-        {
+        Debug.Log("Boss entered Phase 2");
+    }
+
+    public override void updateState(BossManager e)
+    {
+        float distance = Vector3.Distance(e.transform.position, player.position);
+
+        // Too far — do nothing
+        if (distance > aggroRange)
             return;
-            
-        }
 
-
-        else if ((Vector3.Distance(e.transform.position, e.player.transform.position) < runDistance) && (Vector3.Distance(e.transform.position, e.player.transform.position) > runDistance/2))
+        // Too close — flee using NavMesh
+        if (distance < fleeRange)
         {
-           agent.ResetPath();
-           Vector3 direction = (player.position - e.transform.position).normalized;
-           direction.y = 0;
-           e.transform.rotation = Quaternion.LookRotation(direction);
-           gunLogic.Shoot();           
-        }
+            Vector3 fleeDirection = (e.transform.position - player.position).normalized;
+            Vector3 fleeTarget = e.transform.position + fleeDirection * 5f;
 
-        else if(Vector3.Distance(e.transform.position, e.player.transform.position) < runDistance/2){
-            Vector3 directionAway = (e.transform.position - e.player.transform.position ).normalized;
-            float fleeSpeed = 5f;
-            e.transform.position += directionAway * fleeSpeed * Time.deltaTime;
-            
-            
-        }
+            // Sample a valid NavMesh position near the flee target
+            if (UnityEngine.AI.NavMesh.SamplePosition(fleeTarget, out UnityEngine.AI.NavMeshHit hit, 3f, UnityEngine.AI.NavMesh.AllAreas))
+                agent.SetDestination(hit.position);
 
+            FacePlayer(e);
+            gunLogic.Shoot();
+        }
+        // In shoot range — stop and shoot
+        else if (distance < shootRange)
+        {
+            agent.ResetPath();
+            FacePlayer(e);
+            gunLogic.Shoot();
+        }
+        // Out of shoot range — chase
         else
         {
-             agent.SetDestination(GameObject.FindGameObjectWithTag("Player").transform.position);
+            agent.SetDestination(player.position);
         }
+    }
 
+    public override void OnCollsionEnter(BossManager e)
+    {
 
+    }
 
-  }
-  public override void OnCollsionEnter(BossManager e)
-  {
-
-  }
+    private void FacePlayer(BossManager e)
+    {
+        Vector3 direction = (player.position - e.transform.position).normalized;
+        direction.y = 0;
+        e.transform.rotation = Quaternion.LookRotation(direction);
+    }
 }

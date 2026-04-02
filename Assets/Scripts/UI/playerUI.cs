@@ -1,6 +1,5 @@
 using TMPro;
 using Unity.Mathematics;
-using UnityEditor.Rendering.Universal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -28,12 +27,13 @@ public class playerUI : MonoBehaviour
     {
         stats.ResetStats();
         MainMenu();
+        AudioManager.Instance.PlayGameMusic();
     }
 
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame) TakeDamage(15);
+        if (Keyboard.current.oKey.wasPressedThisFrame) TakeDamage(15);
         if (Keyboard.current.xKey.wasPressedThisFrame) GainXP(20);
     }
 
@@ -55,6 +55,9 @@ public void UpdateUI()
     public void TakeDamage(int damage)
     {
         stats.currentHP -= damage;
+        DamageVignette.Instance.Flash();
+        AudioManager.Instance.PlayPlayerHurt();
+
         if(stats.currentHP <= 0)
         {
             TriggerGameOver();

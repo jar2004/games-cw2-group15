@@ -67,8 +67,8 @@ Transform:
   m_LocalScale: {x: 1.832428, y: 1.832428, z: 1.832428}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2694381332534627331}
   - {fileID: 6347230162491734460}
+  - {fileID: 2694381332534627331}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &3894666389303734918
@@ -187,6 +187,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::BossManager
   player: {fileID: 0}
   agent: {fileID: 9063567738792011332}
+  maxHealth: 200
+  currentHealth: 0
 --- !u!54 &3108695243034353596
 Rigidbody:
   m_ObjectHideFlags: 0
