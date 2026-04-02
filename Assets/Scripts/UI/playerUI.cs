@@ -33,7 +33,7 @@ public class playerUI : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (Keyboard.current.spaceKey.wasPressedThisFrame) TakeDamage(15);
+        if (Keyboard.current.oKey.wasPressedThisFrame) TakeDamage(15);
         if (Keyboard.current.xKey.wasPressedThisFrame) GainXP(20);
     }
 

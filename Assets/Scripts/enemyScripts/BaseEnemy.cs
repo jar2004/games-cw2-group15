@@ -27,7 +27,6 @@ public class BaseEnemy : MonoBehaviour
     protected Transform player;
     protected playerUI playerUI;
     protected Animator animator;
-
     protected float currentHealth;
     protected float lastAttackTime;
     protected EnemyState currentState = EnemyState.Idle;
