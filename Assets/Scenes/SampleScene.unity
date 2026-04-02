@@ -130,6 +130,7 @@ GameObject:
   - component: {fileID: 783678109}
   - component: {fileID: 783678110}
   - component: {fileID: 783678111}
+  - component: {fileID: 783678112}
   m_Layer: 0
   m_Name: Trigger
   m_TagString: Untagged
@@ -202,6 +203,21 @@ MonoBehaviour:
   BossPrefab: {fileID: 0}
   EnemyPrefabs: []
   Spawn_Enemies: 0
+--- !u!114 &783678112
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 783678107}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 70df550689bd1cb48a14172868924ab1, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::NewMonoBehaviourScript
+  roomSpawn: {fileID: 0}
+  enemySpawn: {fileID: 0}
+  start: 0
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
   m_ObjectHideFlags: 0
