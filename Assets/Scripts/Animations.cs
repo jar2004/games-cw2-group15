@@ -75,7 +75,7 @@ public class AnimationStateController : MonoBehaviour
     void AnimationState()
     {
         bool isGrounded = movementScript.IsGrounded;
-        bool isAttacking = animator.GetBool("IsAttacking");
+        bool isAttacking = animator.GetBool("isAttacking");
 
         Vector3 horizontalVelocity = new Vector3(controller.velocity.x, 0, controller.velocity.z);
         float currentSpeed = horizontalVelocity.magnitude;
@@ -98,7 +98,7 @@ public class AnimationStateController : MonoBehaviour
             animator.SetFloat("Speed", 0);
         }
 
-        animator.SetBool("IsGround", isGrounded);
+        animator.SetBool("isGround", isGrounded);
 
         if (Input.GetButtonDown("Jump") && isGrounded && !isAttacking)
         {

@@ -1,5 +1,6 @@
 using TMPro;
 using Unity.Mathematics;
+using UnityEditor.Rendering.Universal;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
@@ -23,52 +24,9 @@ public class playerUI : MonoBehaviour
     
     [Header("Data Reference")]
     public playerStats stats; 
-
-    bool lockCursorNextFrame;
-    bool warnedMissingUIBindings;
-
-    bool HasUIBindings()
-    {
-        return UI != null
-            && mainMenu != null
-            && hpSlider != null
-            && xpSlider != null
-            && hpText != null
-            && xpText != null;
-    }
-
-    bool TryForwardToBoundUIInstance(string methodName)
-    {
-        if (HasUIBindings()) return false;
-
-        playerUI[] allUI = FindObjectsByType<playerUI>(FindObjectsInactive.Include, FindObjectsSortMode.None);
-        for (int i = 0; i < allUI.Length; i++)
-        {
-            playerUI candidate = allUI[i];
-            if (candidate == this) continue;
-            if (!candidate.HasUIBindings()) continue;
-
-            if (methodName == nameof(startGame))
-            {
-                candidate.startGame();
-            }
-            else if (methodName == nameof(MainMenu))
-            {
-                candidate.MainMenu();
-            }
-
-            Debug.LogWarning($"playerUI.{methodName}: forwarded call from unbound instance '{name}' to '{candidate.name}'.");
-            return true;
-        }
-
-        return false;
-    }
-
     void Start()
     {
         stats.ResetStats();
-        Time.timeScale = 1;
-
         MainMenu();
     }
 
@@ -77,14 +35,6 @@ public class playerUI : MonoBehaviour
     {
         if (Keyboard.current.spaceKey.wasPressedThisFrame) TakeDamage(15);
         if (Keyboard.current.xKey.wasPressedThisFrame) GainXP(20);
-
-        // Unity UI clicks can override cursor state this frame, so re-apply once on next frame.
-        if (lockCursorNextFrame)
-        {
-            Cursor.lockState = CursorLockMode.Locked;
-            Cursor.visible = false;
-            lockCursorNextFrame = false;
-        }
     }
 
 
@@ -136,7 +86,6 @@ public void UpdateUI()
     {
         gameOverPanel.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         Time.timeScale = 0;
     }
 
@@ -144,7 +93,6 @@ public void UpdateUI()
     {
         levelUpPanel.SetActive(true);
         Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
         Time.timeScale = 0;
     }
 
@@ -153,7 +101,6 @@ public void UpdateUI()
         Time.timeScale = 1;
         levelUpPanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         UpdateUI();
     }
 
@@ -163,7 +110,6 @@ public void UpdateUI()
         Time.timeScale = 1;
         levelUpPanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         UpdateUI();
     }
 
@@ -172,47 +118,28 @@ public void UpdateUI()
         Time.timeScale = 1;
         levelUpPanel.SetActive(false);
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         UpdateUI();
     }
 
     public void RestartGame()
     {
-        Time.timeScale = 1f;
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
     }
 
     public void MainMenu()
     {
-
+        Cursor.lockState = CursorLockMode.None;
+        Time.timeScale = 0;
         UI.SetActive(false);
         mainMenu.SetActive(true);
-        Time.timeScale = 0;
-        Cursor.lockState = CursorLockMode.None;
-        Cursor.visible = true;
-
     }
 
     public void startGame()
     {
-        if (TryForwardToBoundUIInstance(nameof(startGame))) return;
-
-        // Apply gameplay state first so null UI refs do not block unpause/lock.
+        mainMenu.SetActive(false);
+        UI.SetActive(true);
         Cursor.lockState = CursorLockMode.Locked;
-        Cursor.visible = false;
         Time.timeScale = 1;
-
-        if (mainMenu != null) mainMenu.SetActive(false);
-        if (UI != null)
-        {
-            UI.SetActive(true);
-        }
-        else
-        {
-            Debug.LogWarning("playerUI.startGame: UI reference is missing on this playerUI instance.");
-        }
-
-        lockCursorNextFrame = true;
         UpdateUI();
     }
 
