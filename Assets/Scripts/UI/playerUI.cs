@@ -21,6 +21,7 @@ public class playerUI : MonoBehaviour
     public GameObject UI;
 
 
+//asdad
     
     [Header("Data Reference")]
     public playerStats stats; 
