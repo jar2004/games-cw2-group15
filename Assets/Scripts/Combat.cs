@@ -1,65 +1,108 @@
 using UnityEngine;
+using System.Collections;
 
 public class PlayerCombat : MonoBehaviour
 {
-    public playerStats stats; 
-    public Transform origin; 
+    public playerStats stats;
+    public Transform origin;
     public GameObject hitEffectPrefab;
+
+    [Header("Attack Settings")]
     public float attackRange = 2f;
+    public float sphereRadius = 1f;
+    public float attackCooldown = 0.6f;
 
     [Header("Kick Attack")]
     public float kickForce = 20f;
+    public float kickCooldown = 0.8f;
+
+    private bool canPunch = true;
+    private bool canKick = true;
 
     void Update()
     {
-        if (Input.GetButtonDown("Fire1"))
-        {
-            Shoot();
-        }
+        if (Input.GetButtonDown("Fire1") && canPunch)
+            StartCoroutine(Punch());
 
-        if (Input.GetMouseButtonDown(1))
-        {
-            Kick();
-        }
+        if (Input.GetMouseButtonDown(1) && canKick)
+            StartCoroutine(Kick());
     }
 
-    void Shoot()
+    IEnumerator Punch()
     {
-        HitTarget(applyKnockback: false);
+        canPunch = false;
+        try
+        {
+            HitTarget(applyKnockback: false);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Punch error: " + e.Message);
+        }
+        yield return new WaitForSeconds(attackCooldown);
+        canPunch = true;
     }
 
-    void Kick()
+    IEnumerator Kick()
     {
-        HitTarget(applyKnockback: true);
+        canKick = false;
+        try
+        {
+            HitTarget(applyKnockback: true);
+        }
+        catch (System.Exception e)
+        {
+            Debug.LogError("Kick error: " + e.Message);
+        }
+        yield return new WaitForSeconds(kickCooldown);
+        canKick = true;
     }
 
     void HitTarget(bool applyKnockback)
     {
         RaycastHit hit;
 
-        if (Physics.Raycast(origin.position, origin.forward, out hit, attackRange))
-        {
-            Debug.Log("We hit: " + hit.transform.name);
+        if (!Physics.SphereCast(origin.position, sphereRadius, origin.forward, out hit, attackRange))
+            return;
 
-            BaseEnemy target = hit.transform.GetComponentInParent<BaseEnemy>();
-            target.TakeDamage(stats.damage);
-            if (applyKnockback)
-            {
-                ApplyKnockback(hit);
-            }
-            Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
+        if (hit.transform.root == transform.root) return;
+
+        Debug.Log("We hit: " + hit.transform.name);
+
+        // Check for regular enemy
+        BaseEnemy enemy = hit.transform.GetComponentInParent<BaseEnemy>();
+        if (enemy != null && !enemy.IsDead)
+        {
+            enemy.TakeDamage(stats.damage);
+            SpawnHitEffect(hit);
+            if (applyKnockback) ApplyKnockback(hit);
+            return;
         }
+
+        // Check for boss
+        BossManager boss = hit.transform.GetComponentInParent<BossManager>();
+        if (boss != null && !boss.IsDead)
+        {
+            boss.TakeDamage(stats.damage);
+            SpawnHitEffect(hit);
+            if (applyKnockback) ApplyKnockback(hit);
+            return;
+        }
+    }
+
+    void SpawnHitEffect(RaycastHit hit)
+    {
+        if (hitEffectPrefab != null && hit.normal != Vector3.zero)
+            Instantiate(hitEffectPrefab, hit.point, Quaternion.LookRotation(hit.normal));
     }
 
     void ApplyKnockback(RaycastHit hit)
     {
+        Rigidbody targetRigidbody = hit.transform.GetComponentInParent<Rigidbody>();
+        if (targetRigidbody == null) return;
+
         Vector3 kickDirection = (hit.transform.position - transform.position).normalized;
         kickDirection.y = 0f;
-
-        Vector3 kickImpulse = kickDirection * kickForce + Vector3.up;
-
-        Rigidbody targetRigidbody = hit.transform.GetComponentInParent<Rigidbody>();
-        targetRigidbody.AddForce(kickImpulse, ForceMode.Impulse);
-    
+        targetRigidbody.AddForce(kickDirection * kickForce + Vector3.up, ForceMode.Impulse);
     }
 }

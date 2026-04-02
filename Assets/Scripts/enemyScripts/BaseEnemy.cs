@@ -19,11 +19,13 @@ public class BaseEnemy : MonoBehaviour
     public float attackCooldown = 1.5f;
     public float moveSpeed = 3.5f;
     public float detectionRange = 15f;
+    public int xpReward = 35;
+
+    public bool IsDead => currentState == EnemyState.Dead;
 
     protected NavMeshAgent agent;
     protected Transform player;
-    protected playerUI playerHealth;
-
+    protected playerUI playerUI;
     protected Animator animator;
 
     protected float currentHealth;
@@ -35,7 +37,7 @@ public class BaseEnemy : MonoBehaviour
         agent = GetComponent<NavMeshAgent>();
         animator = GetComponentInChildren<Animator>();
         player = GameObject.FindGameObjectWithTag("Player").transform;
-        playerHealth = player.GetComponent<playerUI>();
+        playerUI = player.GetComponent<playerUI>();
 
         currentHealth = maxHealth;
         agent.speed = moveSpeed;
@@ -109,7 +111,7 @@ public class BaseEnemy : MonoBehaviour
         yield return new WaitForSeconds(attackCooldown * 0.5f);
 
         if (DistanceToPlayer() <= attackRange + 0.5f)
-            playerHealth.TakeDamage((int)attackDamage);
+            playerUI.TakeDamage((int)attackDamage);
 
         yield return new WaitForSeconds(attackCooldown * 0.5f);
     }
@@ -124,6 +126,7 @@ public class BaseEnemy : MonoBehaviour
         if (currentState == EnemyState.Dead) return;
 
         currentHealth -= damage;
+        AudioManager.Instance.PlayEnemyHit();
 
         if (currentHealth <= 0)
             Die();
@@ -134,6 +137,12 @@ public class BaseEnemy : MonoBehaviour
         currentState = EnemyState.Dead;
         agent.enabled = false;
         GetComponent<Collider>().enabled = false;
+
+        if (playerUI != null)
+            playerUI.GainXP(xpReward);
+        else
+            Debug.LogWarning("playerUI not found on Player — XP not awarded");
+
         EnemyManager.Instance.UnregisterEnemy(this);
         Destroy(gameObject, 3f);
     }
