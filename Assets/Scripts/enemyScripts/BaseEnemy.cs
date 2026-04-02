@@ -30,6 +30,7 @@ public class BaseEnemy : MonoBehaviour
     protected float lastAttackTime;
     protected EnemyState currentState = EnemyState.Idle;
 
+
     protected virtual void Start()
     {
         agent = GetComponent<NavMeshAgent>();
